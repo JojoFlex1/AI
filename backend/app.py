@@ -206,11 +206,11 @@ def reset_conversation():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
-    print("\n" + "="*60)
+if __name__ == "__main__":
+    print("\n" + "=" * 60)
     print("🎓 MWALIMU AI BACKEND - GROQ (FREE & FAST!)")
-    print("="*60)
-    
+    print("=" * 60)
+
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         print("⚠️  WARNING: GROQ_API_KEY not found!")
@@ -219,11 +219,16 @@ if __name__ == '__main__':
         print("✅ Groq API key loaded!")
         print(f"   Key starts with: {api_key[:20]}...")
         print("🚀 Using: Llama 3.1 70B (Fast & Smart!)")
-    
-    print("\n📡 Backend: http://localhost:5000")
-    print("🔍 Health: http://localhost:5000/health")
-    print("💬 Chat: http://localhost:5000/chat")
+
+    # Get port from Render or default to 5000 locally
+    port = int(os.environ.get("PORT", 5000))
+
+    print(f"\n📡 Backend: http://0.0.0.0:{port}")
+    print(f"🔍 Health: http://0.0.0.0:{port}/health")
+    print(f"💬 Chat: http://0.0.0.0:{port}/chat")
     print("\n🇰🇪 Ready to teach English in Swahili!")
-    print("="*60 + "\n")
-    
-    app.run(debug=True, port=5000)
+    print("=" * 60 + "\n")
+
+    # Run the app so Render can detect the open port
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
