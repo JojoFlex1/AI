@@ -315,25 +315,16 @@ export default function MwalimuAI() {
               ))}
 
               {isProcessing && (
-                <div className="flex justify-start pr-16">
-                  <div className="inline-block bg-muted rounded-2xl rounded-bl-none p-4" style={{ maxWidth: 'fit-content' }}>
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-2xl rounded-bl-none px-4 py-3 max-w-[75%]">
                     <div className="flex items-center gap-2">
                       <BookOpen className="w-4 h-4 text-accent-foreground" />
                       <span className="text-xs font-semibold text-accent-foreground">Mwalimu</span>
                     </div>
                     <div className="flex gap-1 mt-2">
-                      <div
-                        className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                        style={{ animationDelay: "0ms" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                        style={{ animationDelay: "150ms" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                        style={{ animationDelay: "300ms" }}
-                      ></div>
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
                     </div>
                   </div>
                 </div>

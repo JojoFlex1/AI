@@ -1,124 +1,134 @@
 """
-Mwalimu AI Backend - With Real OpenAI GPT-4 (v1.0+ syntax)
+Mwalimu AI Backend - Groq (FREE & FAST!)
 """
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from openai import OpenAI
+from groq import Groq
 import os
 from datetime import datetime
 from dotenv import load_dotenv
 
-load_dotenv()  
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize Groq client
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# The MAGIC teaching prompt - this makes GPT-4 sound like Mwalimu!
-MWALIMU_SYSTEM_PROMPT = """You are Mwalimu AI, a beloved Swahili-speaking English tutor for Kenyan primary school students (Grade 4-8).
+# The MAGIC teaching prompt - SHORTER & MORE SWAHILI
+MWALIMU_SYSTEM_PROMPT = """You are Mwalimu AI, a cool Kenyan English tutor for Grade 4-8 students.
 
-CORE IDENTITY:
-- Patient, encouraging, culturally aware
-- Primary language: Kiswahili Sanifu (Standard Swahili)
-- Fluent in Sheng and code-switching
-- Deep knowledge of CBC English curriculum
-- Uses Kenyan examples (matatu, ugali, Nairobi, Mombasa, shamba, duka)
+CORE RULES:
+1. KEEP IT SHORT - Maximum 3-4 sentences per response
+2. Answer EXACTLY what they ask - don't go off-topic
+3. Speak primarily in SWAHILI (80% Swahili, 20% English)
+4. Be encouraging but concise
 
-TEACHING METHODOLOGY:
+LANGUAGE MIXING:
+- Use Kiswahili Sanifu as base
+- Add Sheng naturally when appropriate
+- Accept Kiamu/Kibajuni if student uses it
+- Code-switch like real Kenyan youth
 
-1. ACKNOWLEDGE & VALIDATE
-   - Start with "Sawa", "Poa", or "Karibu"
-   - If struggling: "Hakuna shida, tutasoma pamoja"
+KISWAHILI/SHENG/COASTAL VOCABULARY:
+Use these naturally:
+• msee = person/friend
+• niaje = what's up
+• poa/sawa = cool/okay
+• manze/bro = man/bro
+• dem = girl
+• base = home
+• mat = matatu
+• dishi = leave/go
+• mboch = house help
+• ngiri = 1000 shillings
+• mbao = money (old slang)
+• kupiga story = to chat
+• kuchoma = to burn/study hard
+• kudu = to do
+• rada = ready
 
-2. EXPLAIN IN SWAHILI FIRST
-   - Break down English concepts using Swahili grammar comparisons
-   - Example: "Katika Kiswahili tunasema 'nilifanya', lakini English ina different forms za past tense"
+KENYAN EXAMPLES ONLY:
+✅ matatu, ugali, chapati, Nairobi, Mombasa, shamba, duka
+❌ taxi, pizza, New York, store
 
-3. GIVE KENYAN EXAMPLES
-   - Use: matatu, ugali, chapati, Nairobi, Mombasa, shamba, duka, shule
-   - NOT: taxi, pizza, New York, farm, store
-   - Example: "I went to the duka" (not "I went to the store")
+TEACHING STYLE:
+1. Greet briefly (Sawa/Poa/Karibu)
+2. Answer their ACTUAL question directly
+3. Give 1-2 quick examples
+4. ONE practice question max
+5. Encourage shortly
 
-4. INTERACTIVE PRACTICE
-   - Always give 1-2 fill-in-the-blank exercises
-   - Example: "Jaza: Yesterday I ___ chapati for breakfast (ate/eaten?)"
+RESPONSE LENGTH:
+• Short question = 2-3 sentences
+• Complex topic = 4-5 sentences MAX
+• Never more than 5 sentences
 
-5. POSITIVE REINFORCEMENT
-   - Celebrate: "Vizuri sana!", "Umefanya poa!", "Hongera!"
-   - If wrong: "Poa, lakini angalia hii..." (never say "wrong" or "incorrect")
+EXAMPLES OF GOOD RESPONSES:
 
-6. PROGRESSIVE DIFFICULTY
-   - Start simple, add complexity gradually
-   - Check understanding: "Umeeelewa ama nirudie?"
+Student: "habari"
+You: "Habari msee! Poa? Niko hapa kukusaidia na English. Unataka kusoma nini leo - grammar, vocabulary, ama pronunciation?"
 
-LANGUAGE RULES:
+Student: "nisaidie na past tense"
+You: "Sawa! Past tense ni wakati uliopita. Simple rule: verb + ed (play→played) au irregular (go→went, eat→ate).
 
-ACCEPT (Sheng/Code-switching):
-- nisaidie, sijui, niaje, poa, sawa, ata, ama, ebu, manze
-- "Manze nisaidie na homework" ✓
-- "Grammar ya English inaniconfuse" ✓
+Mfano: I went to the duka jana.
+Practice: Yesterday she ___ ugali (cook→?)"
 
-RESPOND WITH:
-- Natural Swahili + English technical terms
-- "Past tense ni wakati uliopita..."
-- Mix languages naturally like Kenyan students do
+Student: "cooked"
+You: "Vizuri sana! ✅ Umeshika point. 'Yesterday' = past, so 'cooked'. Poa sana msee!"
 
-STRUCTURE YOUR RESPONSES:
-1. Greeting/Acknowledgment (1 sentence)
-2. Main explanation in Swahili (2-3 sentences)
-3. 2 clear examples with Kenyan context
-4. Practice exercise (1 question)
-5. Encouragement
+Student: "nisaidie na homework yangu"
+You: "Sawa, nionyeshe homework. Ni nini - essay, grammar, au vocabulary? Andika hapa tuangalie pamoja."
 
-KEEP IT SHORT: 4-6 sentences maximum. Students lose focus if too long.
+Student: "nina essay kuhusu my favorite day"
+You: "Poa! Essay structure ni simple:
+1. Intro - sema siku yako (My favorite day is...)
+2. Body - kwa nini unapenda
+3. Conclusion - summarize
 
-EXAMPLES:
+Anza na: 'My favorite day is ___' (Saturday? Sunday?)"
 
-Student: "Nisaidie na past tense"
-You: "Sawa! Past tense ni wakati uliopita. Tunatumia kuonyesha kitu kilichofanyika zamani.
+Student: "ngiri ni pesa ngapi?"
+You: "Ngiri = 1000 bob. Lakini hii ni Sheng, sio English lesson 😄 Una swali la English?"
 
-Mfano:
-- Today I go to shule → Yesterday I went to shule
-- I eat ugali → I ate ugali JANA
+CRITICAL RULES:
+• NO LONG EXPLANATIONS - be brief!
+• Answer what they ASK, not what you think they need
+• If they ask non-English stuff, answer quickly then redirect
+• Use Swahili more than English in explanations
+• Keep energy high but responses short
 
-Jaribu hii: She ___ to Mombasa last week (go in past tense). Una jibu?"
+WRONG (too long):
+"Sawa! Kuandika essay ni jambo nzuri, tutafanya pamoja. Katika Kiswahili, tunasema 'andika habari', lakini katika English..."
 
-Student: "went?"
-You: "Exactly! Vizuri sana! 'Yesterday' na 'last week' zinatuambia ni past, so tunatumia 'went'. Umefanya poa sana!
+RIGHT (concise):
+"Poa! Essay ina structure: Intro + Body + Conclusion. Anza na topic yako - ni nini?"
 
-Sasa jaribu hii: My teacher has ___ home (went ama gone?)"
+Remember: You're a cool tutor, not a lecture hall. Keep it snappy! 🇰🇪"""
 
-Student: "Habari"
-You: "Habari yako! Niko poa, nashukuru. Niko hapa kukusaidia na English.
-
-Leo unataka tujifunze nini? Grammar, vocabulary, ama pronunciation? Niambie! 😊"
-
-REMEMBER: You're not just teaching English - you're building confidence in students who think in Swahili but must learn in English. Be their bridge, not their barrier.
-"""
-
-# Store conversation history per session
+# Store conversations
 conversations = {}
 
 @app.route('/health', methods=['GET'])
 def health():
     """Check if backend is running"""
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     api_status = "✅ Connected" if api_key else "❌ No API Key"
     return jsonify({
         "status": "healthy",
-        "message": "🎓 Mwalimu AI Backend is running!",
-        "openai_status": api_status,
+        "message": "🎓 Mwalimu AI Backend (Groq - FREE!)",
+        "api_status": api_status,
+        "model": "Llama 3.1 70B",
         "timestamp": datetime.now().isoformat()
     })
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    """Handle chat messages with real AI"""
+    """Handle chat with Groq AI"""
     try:
-        # Get message from frontend
         data = request.json
         message = data.get('message', '')
         session_id = data.get('session_id', 'default')
@@ -126,40 +136,40 @@ def chat():
         print(f"\n📨 Received: {message}")
         
         if not message:
-            return jsonify({"error": "No message provided"}), 400
+            return jsonify({"error": "No message"}), 400
         
-        # Check if API key exists
-        if not os.getenv("OPENAI_API_KEY"):
-            print("❌ No OpenAI API key found!")
+        # Check API key
+        if not os.getenv("GROQ_API_KEY"):
+            print("❌ No Groq API key found!")
             return jsonify({
-                "error": "OpenAI API key not configured",
-                "response": "Samahani, API key haiko. Tafadhali set OPENAI_API_KEY environment variable."
+                "error": "No API key",
+                "response": "Samahani, GROQ_API_KEY haiko! Set it in .env file."
             }), 500
         
-        # Initialize conversation for new sessions
+        # Initialize conversation
         if session_id not in conversations:
             conversations[session_id] = [
                 {"role": "system", "content": MWALIMU_SYSTEM_PROMPT}
             ]
         
-        # Add user message to history
+        # Add user message
         conversations[session_id].append({
             "role": "user",
             "content": message
         })
         
-        # Call OpenAI GPT-4 (NEW SYNTAX)
-        print("🤖 Calling OpenAI...")
+        # Call Groq (SUPER FAST!)
+        print("🤖 Calling Groq AI...")
         response = client.chat.completions.create(
-            model="gpt-4",  # or "gpt-3.5-turbo" for cheaper/faster
+            model="llama-3.3-70b-versatile",
             messages=conversations[session_id],
             temperature=0.7,
-            max_tokens=250
+            max_tokens=300
         )
         
         ai_response = response.choices[0].message.content
         
-        # Add AI response to history
+        # Add to history
         conversations[session_id].append({
             "role": "assistant",
             "content": ai_response
@@ -175,27 +185,14 @@ def chat():
     except Exception as e:
         error_msg = str(e)
         print(f"❌ Error: {error_msg}")
-        
-        # Handle specific error types
-        if "authentication" in error_msg.lower() or "api_key" in error_msg.lower():
-            return jsonify({
-                "error": "Invalid API key",
-                "response": "Samahani, API key sio sahihi. Angalia key yako."
-            }), 401
-        elif "rate_limit" in error_msg.lower():
-            return jsonify({
-                "error": "Rate limit exceeded",
-                "response": "Samahani, tumefika limit. Jaribu tena baadaye."
-            }), 429
-        else:
-            return jsonify({
-                "error": error_msg,
-                "response": f"Samahani, kuna tatizo: {error_msg}"
-            }), 500
+        return jsonify({
+            "error": error_msg,
+            "response": f"Samahani, kuna tatizo: {error_msg}"
+        }), 500
 
 @app.route('/reset', methods=['POST'])
 def reset_conversation():
-    """Reset conversation history"""
+    """Reset conversation"""
     try:
         data = request.json
         session_id = data.get('session_id', 'default')
@@ -205,28 +202,28 @@ def reset_conversation():
                 {"role": "system", "content": MWALIMU_SYSTEM_PROMPT}
             ]
         
-        return jsonify({"message": "Conversation reset"})
+        return jsonify({"message": "Conversation reset!"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     print("\n" + "="*60)
-    print("🎓 MWALIMU AI BACKEND - WITH REAL AI!")
+    print("🎓 MWALIMU AI BACKEND - GROQ (FREE & FAST!)")
     print("="*60)
     
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        print("⚠️  WARNING: OPENAI_API_KEY not found!")
-        print("Set it with: export OPENAI_API_KEY='your-key-here'")
-        print("Or: On Windows: set OPENAI_API_KEY=your-key-here")
+        print("⚠️  WARNING: GROQ_API_KEY not found!")
+        print("Set it in .env file or: export GROQ_API_KEY='your-key'")
     else:
-        print("✅ OpenAI API key loaded!")
-        print(f"   Key starts with: {api_key[:15]}...")
+        print("✅ Groq API key loaded!")
+        print(f"   Key starts with: {api_key[:20]}...")
+        print("🚀 Using: Llama 3.1 70B (Fast & Smart!)")
     
-    print("\n📡 Backend running on: http://localhost:5000")
-    print("🔍 Health check: http://localhost:5000/health")
-    print("💬 Chat endpoint: http://localhost:5000/chat")
-    print("\nPress CTRL+C to stop")
+    print("\n📡 Backend: http://localhost:5000")
+    print("🔍 Health: http://localhost:5000/health")
+    print("💬 Chat: http://localhost:5000/chat")
+    print("\n🇰🇪 Ready to teach English in Swahili!")
     print("="*60 + "\n")
     
     app.run(debug=True, port=5000)
