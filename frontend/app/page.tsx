@@ -10,6 +10,14 @@ interface Message {
   timestamp: Date
 }
 
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string
+}
+
 export default function MwalimuAI() {
   const [isListening, setIsListening] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
@@ -64,7 +72,7 @@ export default function MwalimuAI() {
       } else {
         setIsOnline(false)
       }
-    } catch (error) {
+    } catch {
       setIsOnline(false)
     }
   }
@@ -72,6 +80,7 @@ export default function MwalimuAI() {
   // Handle voice recording with Web Speech API
   const handleVoicePress = () => {
     if (!isListening) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
       
       if (!SpeechRecognition) {
@@ -87,17 +96,19 @@ export default function MwalimuAI() {
       setIsListening(true)
       setRecordingTime(0)
       
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript
+      recognition.onresult = (event: Event) => {
+        const speechEvent = event as SpeechRecognitionEvent
+        const transcript = speechEvent.results[0][0].transcript
         console.log('🎤 Heard:', transcript)
         setInputText(transcript)
         setIsListening(false)
       }
       
-      recognition.onerror = (event: any) => {
-        console.error('❌ Speech error:', event.error)
+      recognition.onerror = (event: Event) => {
+        const errorEvent = event as SpeechRecognitionErrorEvent
+        console.error('❌ Speech error:', errorEvent.error)
         setIsListening(false)
-        if (event.error === 'no-speech') {
+        if (errorEvent.error === 'no-speech') {
           alert('Sikuona sauti. Jaribu tena!')
         }
       }
@@ -112,7 +123,7 @@ export default function MwalimuAI() {
   }
 
   // Handle text input
-  const handleTextSubmit = (e: any) => {
+  const handleTextSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault?.()
     if (inputText.trim() && !isProcessing) {
       handleSendMessage(inputText)
@@ -157,8 +168,8 @@ export default function MwalimuAI() {
 
       setConversation(prev => [...prev, aiMessage])
 
-    } catch (error) {
-      console.error('❌ Error connecting to backend:', error)
+    } catch (err) {
+      console.error('❌ Error connecting to backend:', err)
       setIsOnline(false)
       setShowOfflineHelp(true)
       
@@ -439,29 +450,23 @@ export default function MwalimuAI() {
             </p>
 
             {/* Text Input */}
-            <div className="flex gap-3">
+            <form onSubmit={handleTextSubmit} className="flex gap-3">
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleTextSubmit(e as any)
-                  }
-                }}
                 placeholder="Andika swali lako hapa..."
                 disabled={isProcessing}
                 className="flex-1 px-5 py-4 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring text-sm bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               />
               <Button
-                onClick={(e) => handleTextSubmit(e as any)}
+                type="submit"
                 disabled={!inputText.trim() || isProcessing}
                 className="px-8 py-4 flex items-center gap-2 text-base hover:scale-105 transition-transform"
               >
                 <Send className="w-5 h-5" />
               </Button>
-            </div>
+            </form>
           </div>
         </main>
 
